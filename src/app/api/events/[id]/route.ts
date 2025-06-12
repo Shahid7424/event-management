@@ -1,20 +1,12 @@
-import { connectDB } from "../../../lib/db";
-import { Event } from "../../../models/Event";
+import { connectDB } from "@/app/lib/db";
+import { Event } from "@/app/models/Event";
 import { NextRequest, NextResponse } from "next/server";
-// import type { NextApiRequest } from "next";
 
-// Correctly define the context type for App Router handlers
-interface RouteContext {
-  params: {
-    id: string;
-  };
-}
-
-// GET /api/events/[id]
-export async function GET(req: NextRequest, { params }: RouteContext) {
+// Correct structure for context param in App Router handlers
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
   try {
     await connectDB();
-    const event = await Event.findById(params.id);
+    const event = await Event.findById(context.params.id);
 
     if (!event) {
       return NextResponse.json(
@@ -33,12 +25,11 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
   }
 }
 
-// PUT /api/events/[id]
-export async function PUT(req: NextRequest, { params }: RouteContext) {
+export async function PUT(req: NextRequest, context: { params: { id: string } }) {
   try {
     await connectDB();
     const body = await req.json();
-    const updated = await Event.findByIdAndUpdate(params.id, body, {
+    const updated = await Event.findByIdAndUpdate(context.params.id, body, {
       new: true,
     });
 
@@ -59,11 +50,10 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
   }
 }
 
-// DELETE /api/events/[id]
-export async function DELETE(req: NextRequest, { params }: RouteContext) {
+export async function DELETE(req: NextRequest, context: { params: { id: string } }) {
   try {
     await connectDB();
-    const deleted = await Event.findByIdAndDelete(params.id);
+    const deleted = await Event.findByIdAndDelete(context.params.id);
 
     if (!deleted) {
       return NextResponse.json(
