@@ -3,8 +3,15 @@
 import { useEffect, useState } from "react"
 import { Button } from "../components/ui/button"
 
+type RSVP = {
+  _id: string
+  name: string
+  email: string
+  createdAt: string | Date
+}
+
 export function RSVPList({ eventId }: { eventId: string }) {
-  const [rsvps, setRsvps] = useState<any[]>([])
+  const [rsvps, setRsvps] = useState<RSVP[]>([])
   const [error, setError] = useState("")
 
   useEffect(() => {
@@ -15,8 +22,9 @@ export function RSVPList({ eventId }: { eventId: string }) {
         const data = await res.json()
         if (data.success) setRsvps(data.rsvps)
         else throw new Error(data.error || "Unknown error")
-      } catch (err: any) {
-        setError(err.message)
+      } catch (err: unknown) {
+        if (err instanceof Error) setError(err.message)
+        else setError("An unknown error occurred")
       }
     }
 
@@ -27,7 +35,12 @@ export function RSVPList({ eventId }: { eventId: string }) {
     const csvContent =
       "data:text/csv;charset=utf-8," +
       ["Name,Email,Date"]
-        .concat(rsvps.map(r => `${r.name},${r.email},${new Date(r.createdAt).toLocaleString()}`))
+        .concat(
+          rsvps.map(
+            (r) =>
+              `${r.name},${r.email},${new Date(r.createdAt).toLocaleString()}`
+          )
+        )
         .join("\n")
 
     const encodedUri = encodeURI(csvContent)
@@ -51,8 +64,12 @@ export function RSVPList({ eventId }: { eventId: string }) {
       <ul className="border border-gray-200 rounded-md divide-y">
         {rsvps.map((rsvp) => (
           <li key={rsvp._id} className="p-4">
-            <p><strong>{rsvp.name}</strong> — {rsvp.email}</p>
-            <p className="text-sm text-gray-500">{new Date(rsvp.createdAt).toLocaleString()}</p>
+            <p>
+              <strong>{rsvp.name}</strong> — {rsvp.email}
+            </p>
+            <p className="text-sm text-gray-500">
+              {new Date(rsvp.createdAt).toLocaleString()}
+            </p>
           </li>
         ))}
       </ul>

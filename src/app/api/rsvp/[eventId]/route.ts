@@ -8,6 +8,7 @@ export async function GET(_: NextRequest, { params }: { params: { eventId: strin
     const rsvps = await RSVP.find({ eventId: params.eventId }).sort({ createdAt: -1 })
     return NextResponse.json({ success: true, rsvps })
   } catch (error) {
+    console.error("❌ RSVP fetch error:", error) // ✅ Use the error
     return NextResponse.json({ success: false, error: "Failed to fetch RSVP list" }, { status: 500 })
   }
 }

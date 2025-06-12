@@ -5,20 +5,25 @@ import bcrypt from "bcrypt"
 
 export async function POST(req: NextRequest) {
   await connectDB()
+
   const { name, email, password } = await req.json()
 
-  const existing = await User.findOne({ email })
-  if (existing) {
+  // Check if email already exists
+  const existingUser = await User.findOne({ email })
+  if (existingUser) {
     return NextResponse.json({ message: "Email already exists" }, { status: 400 })
   }
 
+  // Hash the password
   const hashedPassword = await bcrypt.hash(password, 10)
-  const user = await User.create({
+
+  // Create user
+  await User.create({
     name,
     email,
     password: hashedPassword,
-    role: "event_owner",
+    role: "event_owner", // or "user" / "admin" as needed
   })
 
-  return NextResponse.json({ message: "User created" }, { status: 201 })
+  return NextResponse.json({ message: "User created successfully" }, { status: 201 })
 }

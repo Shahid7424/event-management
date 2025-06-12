@@ -1,31 +1,34 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "../components/ui/button"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "../components/ui/button";
 
 export default function RegisterPage() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" })
-  const [error, setError] = useState("")
-  const router = useRouter()
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [error, setError] = useState("");
+  const router = useRouter();
 
-  const handleChange = (e: any) => setForm({ ...form, [e.target.name]: e.target.value })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault()
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
-    })
+    });
 
     if (!res.ok) {
-      const data = await res.json()
-      return setError(data.message || "Something went wrong")
+      const data: { message?: string } = await res.json();
+      return setError(data.message || "Something went wrong");
     }
 
-    router.push("/login")
-  }
+    router.push("/login");
+  };
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10 border rounded shadow">
@@ -57,5 +60,5 @@ export default function RegisterPage() {
         <Button className="w-full" type="submit">Register</Button>
       </form>
     </div>
-  )
+  );
 }

@@ -24,8 +24,13 @@ export async function POST(req: NextRequest) {
 
     console.log("✅ EVENT CREATED:", event)
     return NextResponse.json({ success: true, event }, { status: 201 })
-  } catch (err: any) {
-    console.error("❌ DB ERROR:", err)
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("❌ DB ERROR:", err.message)
+    } else {
+      console.error("❌ Unknown DB error:", err)
+    }
+
     return NextResponse.json({ success: false, message: "Error saving event" }, { status: 500 })
   }
 }
